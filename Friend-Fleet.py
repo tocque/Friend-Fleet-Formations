@@ -118,9 +118,9 @@ for Index, i in enumerate(RealPoint):
                     k+1, m+1, FoundEquipmentDetails(int(j['api_Slot'][k][m]), 'name'))
         wikiCodeStr += '}}'
         wikiCodeStr += '\n'
-    if not(os.path.exists('./Formations')):
-        os.makedirs('./Formations')
-    with open('./Formations/E{}{}点.txt'.format(i[0], i[1]), 'w', encoding='utf-8') as File:
+    if not(os.path.exists('./FormationsCode')):
+        os.makedirs('./FormationsCode')
+    with open('./FormationsCode/E{}{}点.txt'.format(i[0], i[1]), 'w', encoding='utf-8') as File:
         File.write(wikiCodeStr)
 
 print("友军阵容已生成，位于当前目录下的Formations文件夹内")
@@ -136,14 +136,25 @@ for i in RealPoint:
                 VoiceList.append([j['api_ship_id'][k], j['api_voice_id'][k]])
 
 # 生成友军语音
-if not(os.path.exists('./Voice')):
-    os.makedirs('./Voice')
+if not(os.path.exists('./VoiceFile')):
+    os.makedirs('./VoiceFile')
+voiceCodeStr = '{{台词翻译表/页头}}\n'
 for Index, i in enumerate(VoiceList):
     print("正在下载友军语音：{}/{}".format(Index+1, len(VoiceList)))
     GetVoive = requests.get(
         'http://kcs.kcwiki.cn/kcs2/sound/kc{}/{}.mp3'.format(FoundShipDetails(i[0], 'filename'), i[1]))
     if(GetVoive.status_code == 200):
-        with open("./Voice/{}-FriendFleet{}.mp3".format(i[0], i[1]), "wb") as Music:
+        with open("./VoiceFile/{}-FriendFleet{}.mp3".format(i[0], i[1]), "wb") as Music:
             Music.write(GetVoive.content)
+        voiceCodeStr += '{{台词翻译表\n'
+        voiceCodeStr += ' | 档名 = {}-FriendFleet{}\n'.format(i[0], i[1])
+        voiceCodeStr += ' | 场合 = {}\n'.format(FoundShipDetails(i[0], 'name'))
+        voiceCodeStr += ' | 日文台词 = \n'
+        voiceCodeStr += ' | 中文译文 = \n'
+        voiceCodeStr += '}}\n'
+voiceCodeStr += '{{页尾}}'
+with open('./FormationsCode/友军舰队语音.txt', 'w', encoding='utf-8') as File:
+    File.write(voiceCodeStr)
+
 
 print("友军语音已生成，位于当前目录下的Voice文件夹内")
