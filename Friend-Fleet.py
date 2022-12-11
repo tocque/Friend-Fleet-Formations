@@ -46,13 +46,16 @@ for Index, i in enumerate(RemovingRedundant):
 
 # RealPoint为归纳同一个点的不同路径，格式为[E几mapinfo_no，路径点，[路径curCellId,路径curCellId...]]
 # 此处利用了kcnav（https://tsunkit.net/nav/）的api，第一次使用，稳定性尚需确认
-# 网址https://tsunkit.net/api/routing/maps/53-5的route即路径点的信息，格式为{路径:[出发点,到达点,？,？],...}
+# 网址https://tsunkit.net/api/routing/maps/53-5的route即路径点的信息，格式为{result:{路径:[出发点,到达点,？,？],...}}
 RealPoint = []
 TempPoints = []
 TempPoint = []
 for i in RemovingFaults:
-    Route = json.loads(requests.get(
-        'https://tsunkit.net/api/routing/maps/{}-{}'.format(MapareaId, i[0])).content)["route"]
+    if i[0] < 0 or i[1] < 0:
+        break
+    MapRouteJSON = requests.get(
+        'https://tsunkit.net/api/routing/maps/{}-{}'.format(MapareaId, i[0])).content
+    Route = json.loads(MapRouteJSON)["result"]["route"]
     Points = [i[0], Route[str(i[1])][1]]
     try:
         index = TempPoints.index(Points)
